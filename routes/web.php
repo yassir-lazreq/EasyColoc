@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\ColocationController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InvitationController;
@@ -38,6 +39,17 @@ Route::middleware('auth')->group(function () {
     // Invitations (sent)
     Route::post('invitations', [InvitationController::class, 'store'])->name('invitations.store');
     Route::delete('invitations/{invitation}', [InvitationController::class, 'destroy'])->name('invitations.destroy');
+});
+
+// Admin routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [AdminController::class, 'index'])->name('dashboard');
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::post('/users/{user}/ban', [AdminController::class, 'ban'])->name('users.ban');
+    Route::post('/users/{user}/unban', [AdminController::class, 'unban'])->name('users.unban');
+    Route::post('/users/{user}/promote', [AdminController::class, 'promote'])->name('users.promote');
+    Route::get('/colocations', [AdminController::class, 'colocations'])->name('colocations');
+    Route::delete('/colocations/{colocation}', [AdminController::class, 'destroyColocation'])->name('colocations.destroy');
 });
 
 // Public invitation routes (no auth)

@@ -15,6 +15,10 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (!$request->user() || !$request->user()->isAdmin()) {
+            abort(403, 'Access denied. Admins only.');
+        }
+
         return $next($request);
     }
 }
