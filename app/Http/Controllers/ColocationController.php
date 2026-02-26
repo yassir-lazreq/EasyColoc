@@ -49,6 +49,13 @@ class ColocationController extends Controller
             'name' => ['required', 'string', 'max:255'],
         ]);
 
+        // A user can only be in one active colocation at a time
+        /** @var \App\Models\User $authUser */
+        $authUser = Auth::user();
+        if ($authUser->hasActiveColocation()) {
+            return back()->withErrors(['error' => 'You are already a member of an active colocation. You must leave it before creating a new one.']);
+        }
+
         DB::transaction(function () use ($validated) {
             $colocation = Colocation::create([
                 'name' => $validated['name'],

@@ -134,11 +134,17 @@ class InvitationController extends Controller
             return back()->withErrors(['error' => 'This invitation was sent to a different email address.']);
         }
 
-        // Check if already a member
+        // Check if already a member of this colocation
         if ($invitation->colocation->hasActiveMember($user)) {
             return redirect()
                 ->route('colocations.show', $invitation->colocation)
                 ->with('info', 'You are already a member of this colocation.');
+        }
+
+        // A user can only be in one active colocation at a time
+        /** @var \App\Models\User $user */
+        if ($user->hasActiveColocation()) {
+            return back()->withErrors(['error' => 'You are already a member of an active colocation. You must leave it before joining a new one.']);
         }
 
         DB::transaction(function () use ($invitation, $user) {

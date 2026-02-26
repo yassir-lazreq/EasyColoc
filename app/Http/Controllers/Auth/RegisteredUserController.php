@@ -41,6 +41,11 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // If this is the first user, promote them to admin
+        if (User::count() === 1) {
+            $user->promoteToAdmin();
+        }
+
         event(new Registered($user));
 
         Auth::login($user);
