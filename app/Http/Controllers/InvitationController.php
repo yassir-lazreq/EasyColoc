@@ -23,9 +23,9 @@ class InvitationController extends Controller
 
         $colocation = Colocation::findOrFail($validated['colocation_id']);
 
-        // Only owner or members can send invitations
-        if (!$colocation->hasActiveMember(Auth::user())) {
-            abort(403, 'You are not authorized to send invitations for this colocation.');
+        // Only the owner can send invitations
+        if ($colocation->owner_id !== Auth::id()) {
+            abort(403, 'Only the owner can send invitations for this colocation.');
         }
 
         // Check if user with this email already exists and is a member
