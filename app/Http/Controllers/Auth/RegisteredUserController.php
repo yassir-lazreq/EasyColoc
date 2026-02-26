@@ -50,6 +50,11 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        // Redirect to pending invitation if one was stored before registration
+        if ($token = $request->session()->pull('pending_invitation_token')) {
+            return redirect()->route('invitations.show-accept', $token);
+        }
+
         return redirect(route('dashboard', absolute: false));
     }
 }

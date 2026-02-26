@@ -63,6 +63,14 @@ class Colocation extends Model
     }
 
     /**
+     * Get the categories for the colocation.
+     */
+    public function categories()
+    {
+        return $this->hasMany(Category::class);
+    }
+
+    /**
      * Get the expenses for the colocation.
      */
     public function expenses()

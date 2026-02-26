@@ -90,7 +90,15 @@ class ColocationController extends Controller
             ->limit(5)
             ->get();
 
-        return view('colocations.show', compact('colocation', 'recentExpenses'));
+        $pendingInvitations = [];
+        if ($colocation->owner_id === Auth::id()) {
+            $pendingInvitations = \App\Models\Invitation::where('colocation_id', $colocation->id)
+                ->valid()
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
+        return view('colocations.show', compact('colocation', 'recentExpenses', 'pendingInvitations'));
     }
 
     /**

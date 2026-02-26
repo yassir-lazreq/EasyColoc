@@ -21,7 +21,9 @@ class AdminController extends Controller
             'active_colocations'=> Colocation::where('status', 'active')->count(),
         ];
 
-        return view('admin.dashboard', compact('stats'));
+        $recentUsers = User::orderBy('created_at', 'desc')->limit(5)->get();
+
+        return view('admin.dashboard', compact('stats', 'recentUsers'));
     }
 
     /**

@@ -26,7 +26,7 @@ class ExpenseController extends Controller
             ->paginate(20);
 
         $totalExpenses = $colocation->expenses->sum('amount');
-        $categories = Category::all();
+        $categories = $colocation->categories()->orderBy('name')->get();
 
         return view('expenses.index', compact('colocation', 'expenses', 'totalExpenses', 'categories'));
     }
@@ -39,7 +39,7 @@ class ExpenseController extends Controller
         $this->ensureMemberAccess($colocation);
 
         $members = $colocation->activeMembers;
-        $categories = Category::all();
+        $categories = $colocation->categories()->orderBy('name')->get();
 
         return view('expenses.create', compact('colocation', 'members', 'categories'));
     }
@@ -55,7 +55,7 @@ class ExpenseController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'numeric', 'min:0.01', 'max:999999.99'],
             'date' => ['required', 'date', 'before_or_equal:today'],
-            'category_id' => ['required', 'exists:categories,id'],
+            'category_id' => ['nullable', 'exists:categories,id,colocation_id,' . $colocation->id],
             'paid_by' => ['required', 'exists:users,id'],
         ]);
 
@@ -107,7 +107,7 @@ class ExpenseController extends Controller
         }
 
         $members = $colocation->activeMembers;
-        $categories = Category::all();
+        $categories = $colocation->categories()->orderBy('name')->get();
 
         return view('expenses.edit', compact('colocation', 'expense', 'members', 'categories'));
     }
@@ -128,7 +128,7 @@ class ExpenseController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'amount' => ['required', 'numeric', 'min:0.01', 'max:999999.99'],
             'date' => ['required', 'date', 'before_or_equal:today'],
-            'category_id' => ['required', 'exists:categories,id'],
+            'category_id' => ['nullable', 'exists:categories,id,colocation_id,' . $colocation->id],
             'paid_by' => ['required', 'exists:users,id'],
         ]);
 

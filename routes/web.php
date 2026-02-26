@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ColocationController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\InvitationController;
@@ -9,7 +10,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('dashboard');
 });
 
 Route::get('/dashboard', function () {
@@ -27,6 +28,9 @@ Route::middleware('auth')->group(function () {
     Route::post('colocations/{colocation}/leave', [ColocationController::class, 'leave'])->name('colocations.leave');
     Route::delete('colocations/{colocation}/members/{user}', [ColocationController::class, 'removeMember'])->name('colocations.members.remove');
     
+    // Categories (owner only, nested under colocation)
+    Route::resource('colocations.categories', CategoryController::class)->only(['store', 'update', 'destroy']);
+
     // Expenses (nested under colocation)
     Route::resource('colocations.expenses', ExpenseController::class);
     

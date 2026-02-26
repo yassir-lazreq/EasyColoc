@@ -15,9 +15,18 @@ class Category extends Model
      * @var array<string>
      */
     protected $fillable = [
+        'colocation_id',
         'name',
         'description',
     ];
+
+    /**
+     * Get the colocation this category belongs to.
+     */
+    public function colocation()
+    {
+        return $this->belongsTo(Colocation::class);
+    }
 
     /**
      * Get the expenses for the category.
