@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\InvitationMail;
 use App\Models\Colocation;
 use App\Models\Invitation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class InvitationController extends Controller
 {
@@ -54,8 +56,8 @@ class InvitationController extends Controller
             'expires_at' => now()->addDays(7),
         ]);
 
-        // TODO: Send email notification with invitation link
-        // Mail::to($validated['email'])->send(new InvitationMail($invitation));
+        // Send email notification with invitation link
+        Mail::to($validated['email'])->send(new InvitationMail($invitation));
 
         return back()->with('success', 'Invitation sent successfully.');
     }
