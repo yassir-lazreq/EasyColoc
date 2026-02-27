@@ -270,6 +270,53 @@ class ColocationController extends Controller
     }
 
     /**
+     * Transfer colocation ownership to another active member.
+     */
+    public function transferOwnership(Request $request, Colocation $colocation)
+    {
+        /** @var User|null $authUser */
+        $authUser = Auth::user();
+
+        if (!$authUser instanceof User) {
+            abort(403, 'Unauthenticated user.');
+        }
+
+        if ($colocation->owner_id !== $authUser->id) {
+            abort(403, 'Only the owner can transfer ownership.');
+        }
+
+        $validated = $request->validate([
+            'user_id' => ['required', 'integer', 'exists:users,id'],
+        ]);
+
+        $newOwner = User::findOrFail($validated['user_id']);
+
+        if ($newOwner->id === $colocation->owner_id) {
+            return back()->withErrors(['user_id' => 'This user is already the owner.']);
+        }
+
+        if (!$colocation->hasActiveMember($newOwner)) {
+            return back()->withErrors(['user_id' => 'Ownership can only be transferred to an active member.']);
+        }
+
+        DB::transaction(function () use ($colocation, $authUser, $newOwner) {
+            $colocation->update([
+                'owner_id' => $newOwner->id,
+            ]);
+
+            $colocation->members()->updateExistingPivot($authUser->id, [
+                'role' => 'member',
+            ]);
+
+            $colocation->members()->updateExistingPivot($newOwner->id, [
+                'role' => 'owner',
+            ]);
+        });
+
+        return back()->with('success', 'Ownership transferred successfully.');
+    }
+
+    /**
      * Display the balance sheet for the colocation.
      */
     public function balances(Colocation $colocation)

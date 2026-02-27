@@ -26,6 +26,7 @@ Route::middleware('auth')->group(function () {
     // Colocations
     Route::resource('colocations', ColocationController::class);
     Route::post('colocations/{colocation}/leave', [ColocationController::class, 'leave'])->name('colocations.leave');
+    Route::post('colocations/{colocation}/transfer-ownership', [ColocationController::class, 'transferOwnership'])->name('colocations.transfer-ownership');
     Route::delete('colocations/{colocation}/members/{user}', [ColocationController::class, 'removeMember'])->name('colocations.members.remove');
     
     // Categories (owner only, nested under colocation)

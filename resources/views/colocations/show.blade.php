@@ -30,18 +30,32 @@
                                 </div>
                                 <div>
                                     <p class="text-sm font-medium text-gray-800">{{ $member->name }}</p>
-                                    @if($member->id === $colocation->owner_id)
-                                        <p class="text-xs text-indigo-500">Owner</p>
-                                    @endif
+                                    <div class="flex items-center gap-2">
+                                        @if($member->id === $colocation->owner_id)
+                                            <span class="text-xs text-indigo-500">Owner</span>
+                                        @endif
+                                        <span class="text-xs {{ $member->reputation >= 0 ? 'text-green-600' : 'text-red-500' }}">
+                                            ★ {{ $member->reputation >= 0 ? '+' : '' }}{{ $member->reputation }}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                             @if($colocation->owner_id === Auth::id() && $member->id !== Auth::id())
-                                <form method="POST" action="{{ route('colocations.members.remove', [$colocation, $member]) }}">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" onclick="return confirm('Remove {{ $member->name }}?')" class="text-xs text-red-500 hover:text-red-700 transition">
-                                        Remove
-                                    </button>
-                                </form>
+                                <div class="flex items-center gap-3">
+                                    <form method="POST" action="{{ route('colocations.transfer-ownership', $colocation) }}">
+                                        @csrf
+                                        <input type="hidden" name="user_id" value="{{ $member->id }}">
+                                        <button type="submit" onclick="return confirm('Transfer ownership to {{ $member->name }}?')" class="text-xs text-indigo-500 hover:text-indigo-700 transition">
+                                            Make owner
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{{ route('colocations.members.remove', [$colocation, $member]) }}">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" onclick="return confirm('Remove {{ $member->name }}?')" class="text-xs text-red-500 hover:text-red-700 transition">
+                                            Remove
+                                        </button>
+                                    </form>
+                                </div>
                             @endif
                         </li>
                     @endforeach
