@@ -129,6 +129,24 @@ class ColocationController extends Controller
             'status' => ['nullable', 'in:active,cancelled'],
         ]);
 
+        $isCancelling = ($validated['status'] ?? null) === 'cancelled' && !$colocation->isCancelled();
+
+        if ($isCancelling) {
+            $this->recalculateBalances($colocation);
+
+            $activeMemberIds = $colocation->activeMembers()->pluck('users.id');
+            $hasUnsettledDebts = Balance::where('colocation_id', $colocation->id)
+                ->whereIn('user_id', $activeMemberIds)
+                ->get()
+                ->contains(fn (Balance $balance) => !$balance->isSettled());
+
+            if ($hasUnsettledDebts) {
+                return back()
+                    ->withErrors(['status' => 'You can only cancel the colocation once all debts are resolved.'])
+                    ->withInput();
+            }
+        }
+
         $colocation->update($validated);
 
         return redirect()
