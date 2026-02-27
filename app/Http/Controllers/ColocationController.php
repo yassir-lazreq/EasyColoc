@@ -160,7 +160,12 @@ class ColocationController extends Controller
      */
     public function leave(Colocation $colocation)
     {
+        /** @var User|null $user */
         $user = Auth::user();
+
+        if (!$user instanceof User) {
+            abort(403, 'Unauthenticated user.');
+        }
 
         // Owner cannot leave, must delete colocation or transfer ownership
         if ($colocation->owner_id === $user->id) {
@@ -173,6 +178,22 @@ class ColocationController extends Controller
         }
 
         DB::transaction(function () use ($colocation, $user) {
+            // Get user's balance for this colocation
+            $balance = Balance::where('colocation_id', $colocation->id)
+                ->where('user_id', $user->id)
+                ->first();
+
+            // Update reputation based on debt status
+            if ($balance) {
+                if ($balance->isSettled()) {
+                    // User leaves with resolved debts: +1 reputation
+                    $user->incrementReputation();
+                } elseif ($balance->owes()) {
+                    // User leaves with unpaid debts: -1 reputation
+                    $user->decrementReputation();
+                }
+            }
+
             // Update pivot table to mark as left
             $colocation->members()->updateExistingPivot($user->id, [
                 'left_at' => now(),
@@ -205,6 +226,22 @@ class ColocationController extends Controller
         }
 
         DB::transaction(function () use ($colocation, $user) {
+            // Get user's balance for this colocation
+            $balance = Balance::where('colocation_id', $colocation->id)
+                ->where('user_id', $user->id)
+                ->first();
+
+            // Update reputation based on debt status
+            if ($balance) {
+                if ($balance->isSettled()) {
+                    // User leaves with resolved debts: +1 reputation
+                    $user->incrementReputation();
+                } elseif ($balance->owes()) {
+                    // User leaves with unpaid debts: -1 reputation
+                    $user->decrementReputation();
+                }
+            }
+
             // Update pivot table to mark as left
             $colocation->members()->updateExistingPivot($user->id, [
                 'left_at' => now(),

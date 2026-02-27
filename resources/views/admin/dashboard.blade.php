@@ -2,7 +2,7 @@
     <x-slot name="header">Admin Dashboard</x-slot>
 
     {{-- Stats grid --}}
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <p class="text-sm text-gray-500 mb-1">Total Users</p>
             <p class="text-3xl font-bold text-indigo-600">{{ $stats['total_users'] }}</p>
@@ -18,6 +18,10 @@
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <p class="text-sm text-gray-500 mb-1">Active Colocations</p>
             <p class="text-3xl font-bold text-green-600">{{ $stats['active_colocations'] }}</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <p class="text-sm text-gray-500 mb-1">Avg Reputation</p>
+            <p class="text-3xl font-bold {{ $stats['avg_reputation'] >= 0 ? 'text-blue-600' : 'text-orange-500' }}">{{ $stats['avg_reputation'] }}</p>
         </div>
     </div>
 
@@ -50,9 +54,14 @@
                             <p class="text-sm font-medium text-gray-800 truncate">{{ $user->name }}</p>
                             <p class="text-xs text-gray-400">{{ $user->created_at->diffForHumans() }}</p>
                         </div>
-                        @if($user->is_banned)
-                            <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">Banned</span>
-                        @endif
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-semibold {{ $user->reputation >= 0 ? 'text-blue-600' : 'text-orange-500' }}">
+                                {{ $user->reputation }}
+                            </span>
+                            @if($user->is_banned)
+                                <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">Banned</span>
+                            @endif
+                        </div>
                     </div>
                 @endforeach
             </div>

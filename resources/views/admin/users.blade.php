@@ -18,6 +18,7 @@
                 <tr class="bg-gray-50 border-b border-gray-100 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
                     <th class="px-6 py-3">User</th>
                     <th class="px-6 py-3">Email</th>
+                    <th class="px-6 py-3">Reputation</th>
                     <th class="px-6 py-3">Joined</th>
                     <th class="px-6 py-3">Status</th>
                     <th class="px-6 py-3 text-right">Actions</th>
@@ -42,6 +43,11 @@
                             </div>
                         </td>
                         <td class="px-6 py-3 text-gray-500">{{ $user->email }}</td>
+                        <td class="px-6 py-3">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {{ $user->reputation >= 5 ? 'bg-green-100 text-green-700' : ($user->reputation >= 0 ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700') }}">
+                                {{ $user->reputation }}
+                            </span>
+                        </td>
                         <td class="px-6 py-3 text-gray-500">{{ $user->created_at->format('d M Y') }}</td>
                         <td class="px-6 py-3">
                             @if($user->is_banned)
@@ -87,7 +93,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-10 text-center text-gray-400 text-sm">No users found.</td>
+                        <td colspan="6" class="px-6 py-10 text-center text-gray-400 text-sm">No users found.</td>
                     </tr>
                 @endforelse
             </tbody>

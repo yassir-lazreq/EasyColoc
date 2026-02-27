@@ -19,6 +19,7 @@ class AdminController extends Controller
             'total_colocations' => Colocation::count(),
             'banned_users'      => User::where('is_banned', true)->count(),
             'active_colocations'=> Colocation::where('status', 'active')->count(),
+            'avg_reputation'    => round(User::avg('reputation'), 1),
         ];
 
         $recentUsers = User::orderBy('created_at', 'desc')->limit(5)->get();
