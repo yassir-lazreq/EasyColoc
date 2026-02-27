@@ -130,7 +130,7 @@ class Invitation extends Model
     public function scopeValid($query)
     {
         return $query->where('status', 'pending')
-                     ->where('expires_at', '>', now());
+                    ->where('expires_at', '>', now());
     }
 
     /**
