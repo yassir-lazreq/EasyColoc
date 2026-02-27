@@ -1,60 +1,75 @@
 <x-app-layout>
-    <x-slot name="header">Edit Payment</x-slot>
-    <x-slot name="headerActions">
-        <a href="{{ route('colocations.payments.show', [$colocation, $payment]) }}" class="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-2.5 px-4 rounded-xl text-sm transition">
-            &larr; Back
-        </a>
-    </x-slot>
+    <x-slot name="header">Edit Payment &mdash; {{ $colocation->name }}</x-slot>
 
-    <div class="max-w-xl mx-auto">
+    <div class="max-w-2xl">
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
-            <form method="POST" action="{{ route('colocations.payments.update', [$colocation, $payment]) }}" class="space-y-5">
-                @csrf @method('PUT')
-
-                <div>
-                    <label for="from_user_id" class="block text-sm font-medium text-gray-700 mb-1.5">From (who paid)</label>
-                    <select id="from_user_id" name="from_user_id" required
-                        class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
-                        @foreach($members as $member)
-                            <option value="{{ $member->id }}" @selected(old('from_user_id', $payment->from_user_id) == $member->id)>{{ $member->name }}</option>
-                        @endforeach
-                    </select>
-                    @error('from_user_id') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
-                </div>
-
-                <div>
-                    <label for="to_user_id" class="block text-sm font-medium text-gray-700 mb-1.5">To (who receives)</label>
-                    <select id="to_user_id" name="to_user_id" required
-                        class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
-                        @foreach($members as $member)
-                            <option value="{{ $member->id }}" @selected(old('to_user_id', $payment->to_user_id) == $member->id)>{{ $member->name }}</option>
-                        @endforeach
-                    </select>
-                    @error('to_user_id') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
+            <form method="POST" action="{{ route('colocations.payments.update', [$colocation, $payment]) }}">
+                @csrf
+                @method('PUT')
+                
+                <div class="space-y-5">
+                    {{-- From User --}}
                     <div>
-                        <label for="amount" class="block text-sm font-medium text-gray-700 mb-1.5">Amount (&euro;)</label>
-                        <input id="amount" name="amount" type="number" step="0.01" min="0.01" value="{{ old('amount', $payment->amount) }}" required
-                            class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
-                        @error('amount') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
+                        <label for="from_user_id" class="block text-sm font-medium text-gray-700 mb-1">From (who paid)</label>
+                        <select id="from_user_id" name="from_user_id" required
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none @error('from_user_id') border-red-400 @enderror">
+                            <option value="">— Select member —</option>
+                            @foreach($members as $member)
+                                <option value="{{ $member->id }}" {{ old('from_user_id', $payment->from_user_id) == $member->id ? 'selected' : '' }}>
+                                    {{ $member->name }}{{ $member->id === Auth::id() ? ' (You)' : '' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('from_user_id')
+                            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                        @enderror
                     </div>
+
+                    {{-- To User --}}
                     <div>
-                        <label for="paid_at" class="block text-sm font-medium text-gray-700 mb-1.5">Date</label>
-                        <input id="paid_at" name="paid_at" type="date" value="{{ old('paid_at', $payment->paid_at->format('Y-m-d')) }}" required
-                            class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
-                        @error('paid_at') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
+                        <label for="to_user_id" class="block text-sm font-medium text-gray-700 mb-1">To (who received)</label>
+                        <select id="to_user_id" name="to_user_id" required
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none @error('to_user_id') border-red-400 @enderror">
+                            <option value="">— Select member —</option>
+                            @foreach($members as $member)
+                                <option value="{{ $member->id }}" {{ old('to_user_id', $payment->to_user_id) == $member->id ? 'selected' : '' }}>
+                                    {{ $member->name }}{{ $member->id === Auth::id() ? ' (You)' : '' }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('to_user_id')
+                            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Amount --}}
+                    <div>
+                        <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">Amount (&euro;)</label>
+                        <input type="number" id="amount" name="amount" step="0.01" min="0.01" value="{{ old('amount', $payment->amount) }}" required
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none @error('amount') border-red-400 @enderror">
+                        @error('amount')
+                            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Date --}}
+                    <div>
+                        <label for="paid_at" class="block text-sm font-medium text-gray-700 mb-1">Payment Date</label>
+                        <input type="date" id="paid_at" name="paid_at" value="{{ old('paid_at', $payment->paid_at->format('Y-m-d')) }}" max="{{ now()->format('Y-m-d') }}"
+                            class="w-full px-4 py-2.5 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none @error('paid_at') border-red-400 @enderror">
+                        @error('paid_at')
+                            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
-                <div class="flex gap-3 pt-2">
-                    <a href="{{ route('colocations.payments.show', [$colocation, $payment]) }}" class="flex-1 text-center bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-xl transition">
+                <div class="flex gap-3 mt-8">
+                    <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl transition">
+                        Update Payment
+                    </button>
+                    <a href="{{ route('colocations.payments.show', [$colocation, $payment]) }}" class="px-6 py-2.5 border border-gray-300 hover:bg-gray-50 rounded-xl text-gray-700 font-medium transition">
                         Cancel
                     </a>
-                    <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl transition">
-                        Save Changes
-                    </button>
                 </div>
             </form>
         </div>

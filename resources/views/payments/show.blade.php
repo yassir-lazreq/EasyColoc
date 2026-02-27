@@ -11,48 +11,54 @@
         </div>
     </x-slot>
 
-    <div class="max-w-lg mx-auto">
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-6">
-            {{-- Transfer visual --}}
-            <div class="flex items-center justify-between gap-4">
-                <div class="text-center flex-1">
-                    <div class="w-14 h-14 rounded-full bg-red-100 text-red-700 flex items-center justify-center text-xl font-bold mx-auto mb-2">
+    <div class="max-w-3xl">
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+            {{-- Payment Flow --}}
+            <div class="flex items-center justify-around mb-8">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-red-100 text-red-700 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-2">
                         {{ strtoupper(substr($payment->fromUser->name, 0, 1)) }}
                     </div>
                     <p class="text-sm font-medium text-gray-800">{{ $payment->fromUser->name }}</p>
-                    <p class="text-xs text-gray-400">Paid</p>
+                    <p class="text-xs text-gray-400">Paid money</p>
                 </div>
-                <div class="flex flex-col items-center gap-1">
-                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+                <div class="flex-1 flex items-center justify-center px-6">
+                    <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                     </svg>
                     <span class="text-2xl font-bold text-green-600">&euro;{{ number_format($payment->amount, 2) }}</span>
+                    <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                    </svg>
                 </div>
-                <div class="text-center flex-1">
-                    <div class="w-14 h-14 rounded-full bg-green-100 text-green-700 flex items-center justify-center text-xl font-bold mx-auto mb-2">
+
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-green-100 text-green-700 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-2">
                         {{ strtoupper(substr($payment->toUser->name, 0, 1)) }}
                     </div>
                     <p class="text-sm font-medium text-gray-800">{{ $payment->toUser->name }}</p>
-                    <p class="text-xs text-gray-400">Received</p>
+                    <p class="text-xs text-gray-400">Received money</p>
                 </div>
             </div>
 
-            <dl class="divide-y divide-gray-50">
-                <div class="py-3 flex justify-between text-sm">
-                    <dt class="text-gray-500">Date</dt>
+            {{-- Details --}}
+            <dl class="space-y-4 border-t border-gray-100 pt-6">
+                <div>
+                    <dt class="text-sm text-gray-500">Payment Date</dt>
                     <dd class="font-medium text-gray-800">{{ $payment->paid_at->format('d F Y') }}</dd>
                 </div>
-                <div class="py-3 flex justify-between text-sm">
-                    <dt class="text-gray-500">Colocation</dt>
-                    <dd class="font-medium">
-                        <a href="{{ route('colocations.show', $colocation) }}" class="text-indigo-600 hover:underline">{{ $colocation->name }}</a>
-                    </dd>
-                </div>
             </dl>
+        </div>
 
-            <div>
+        {{-- Delete action --}}
+        <div class="mt-6 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h3 class="text-sm font-semibold text-gray-700 mb-2">Danger Zone</h3>
+            <p class="text-sm text-gray-500 mb-4">Deleting this payment will reverse its effect on member balances.</p>
+            <div class="flex justify-between items-center">
                 <form method="POST" action="{{ route('colocations.payments.destroy', [$colocation, $payment]) }}">
-                    @csrf @method('DELETE')
+                    @csrf
+                    @method('DELETE')
                     <button type="submit" onclick="return confirm('Delete this payment?')" class="text-sm text-red-500 hover:text-red-700 transition">
                         Delete this payment
                     </button>
